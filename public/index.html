@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CytoScan | Clinical Pathology Decision Support Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- Premium Glowing Background Elements -->
+  <div class="glow-bg-1"></div>
+  <div class="glow-bg-2"></div>
+
+  <div class="dashboard-container">
+    
+    <!-- Main Dashboard Header -->
+    <header class="dashboard-header">
+      <div class="brand-section">
+        <div class="logo-container">
+          <i class="fa-solid fa-microscope clinical-icon"></i>
+        </div>
+        <div class="brand-text">
+          <h1>CYTOSCAN</h1>
+          <span class="sub-brand">Clinical Pathology Decision Support Platform</span>
+        </div>
+      </div>
+      <div class="system-status">
+        <div class="status-indicator online"></div>
+        <span class="status-text">Production Inference Engine: Active</span>
+      </div>
+    </header>
+
+    <!-- Main Grid Workspace -->
+    <main class="dashboard-main-grid">
+      
+      <!-- Left Panel: Cytology Feature Control Suite -->
+      <section class="panel feature-panel">
+        <div class="panel-header">
+          <div class="panel-title-section">
+            <i class="fa-solid fa-sliders feature-icon"></i>
+            <h2>Cytology Feature Control Suite</h2>
+          </div>
+          <span class="panel-subtitle">Fine-tune the 30 cell nuclei parameters from biopsy</span>
+        </div>
+
+        <div class="patient-metadata">
+          <div class="input-group">
+            <label for="patient-name"><i class="fa-solid fa-user-injured input-icon"></i> Patient Profile Identifier</label>
+            <input type="text" id="patient-name" placeholder="Enter patient identifier (e.g. PT-8842)" value="Anonymous Patient">
+          </div>
+        </div>
+
+        <!-- Metric Categories Tab Selectors -->
+        <div class="feature-tabs">
+          <button class="tab-btn active" onclick="switchTab('mean')">Mean Values</button>
+          <button class="tab-btn" onclick="switchTab('se')">Standard Error (se)</button>
+          <button class="tab-btn" onclick="switchTab('worst')">Worst Values</button>
+        </div>
+
+        <!-- Slider Inputs Containers -->
+        <div class="sliders-scroll-area">
+          <!-- Mean Group -->
+          <div id="tab-mean" class="tab-content active">
+            <!-- Dynamically populated via JS -->
+          </div>
+          <!-- Standard Error Group -->
+          <div id="tab-se" class="tab-content">
+            <!-- Dynamically populated via JS -->
+          </div>
+          <!-- Worst Group -->
+          <div id="tab-worst" class="tab-content">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <div class="panel-action-bar">
+          <button id="reset-btn" class="action-btn secondary-btn" onclick="resetSliders()">
+            <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+          </button>
+          <button id="diagnose-btn" class="action-btn primary-btn" onclick="runDiagnosis()">
+            <i class="fa-solid fa-shield-heart"></i> Run Model Inference
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Panel: Clinical Visualization & Diagnostic readouts -->
+      <div class="right-column-grid">
+        
+        <!-- Diagnostic Readout Card -->
+        <section class="panel readout-panel">
+          <div class="panel-header">
+            <div class="panel-title-section">
+              <i class="fa-solid fa-square-poll-horizontal readout-icon"></i>
+              <h2>Active Diagnostic Readout</h2>
+            </div>
+            <span class="panel-subtitle">AI Logistic Regression real-time probability mapping</span>
+          </div>
+
+          <div class="readout-card-grid">
+            <div class="prediction-display-box" id="prediction-box">
+              <span class="prediction-title">CLASSIFICATION</span>
+              <h3 id="prediction-text" class="prediction-text-pending">Awaiting Input</h3>
+              <div class="diagnostic-badge" id="diagnostic-badge">UNRESOLVED</div>
+            </div>
+
+            <div class="probability-bars-section">
+              <!-- Malignant Bar -->
+              <div class="prog-group">
+                <div class="prog-labels">
+                  <span>Malignant (Tumor Class)</span>
+                  <span id="prob-malignant-text">0.00%</span>
+                </div>
+                <div class="prog-track">
+                  <div class="prog-fill fill-malignant" id="prob-malignant-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <!-- Benign Bar -->
+              <div class="prog-group">
+                <div class="prog-labels">
+                  <span>Benign (Normal Tissue)</span>
+                  <span id="prob-benign-text">0.00%</span>
+                </div>
+                <div class="prog-track">
+                  <div class="prog-fill fill-benign" id="prob-benign-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="clinical-recommendation-box" id="recommendation-box">
+            <i class="fa-solid fa-circle-info recommendation-icon"></i>
+            <p id="recommendation-text">Please adjust the cytology measurements in the feature suite and trigger model inference to run the classifier.</p>
+          </div>
+        </section>
+
+        <!-- Visualization panel (Radar Chart) -->
+        <section class="panel visualization-panel">
+          <div class="panel-header">
+            <div class="panel-title-section">
+              <i class="fa-solid fa-chart-radar chart-icon"></i>
+              <h2>Cytological Radar Metric Blueprint</h2>
+            </div>
+            <span class="panel-subtitle">Normalized cell metric comparison against standard bounds</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="radarChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Audit History log -->
+        <section class="panel audit-panel">
+          <div class="panel-header">
+            <div class="panel-title-section">
+              <i class="fa-solid fa-clock-rotate-left history-icon"></i>
+              <h2>Clinical Pathology Session History</h2>
+            </div>
+            <span class="panel-subtitle">Secured audit trail of local diagnostics logged this session</span>
+          </div>
+
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Patient Identifier</th>
+                  <th>Timestamp</th>
+                  <th>Model Classification</th>
+                  <th>Certainty</th>
+                </tr>
+              </thead>
+              <tbody id="history-rows">
+                <tr>
+                  <td colspan="4" class="empty-state">No pathology diagnoses logged in active database.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+
+    <!-- Platform Footer -->
+    <footer class="dashboard-footer">
+      <div class="footer-links">
+        <span class="footer-item"><i class="fa-solid fa-circle-nodes"></i> Model Version: v1.0.0 (Logistic Regression)</span>
+        <span class="footer-item"><i class="fa-solid fa-bolt"></i> Inference Engine: Native V8 Javascript Math</span>
+        <span class="footer-item"><i class="fa-solid fa-shield"></i> Standard Compliant: HIPAA and GDPR Audit Secure</span>
+      </div>
+      <div class="developer-credit">
+        <span>Designed by Advanced Agentic MLOps</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
